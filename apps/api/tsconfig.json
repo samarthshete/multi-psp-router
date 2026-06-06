@@ -1,0 +1,17 @@
+{
+  "extends": "../../packages/config/tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "incremental": true,
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "noEmit": false,
+    "outDir": "dist",
+    "removeComments": true,
+    "sourceMap": true,
+    "target": "ES2021"
+  },
+  "include": ["src/**/*.ts"]
+}

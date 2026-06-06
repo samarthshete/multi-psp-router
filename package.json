@@ -1,0 +1,19 @@
+{
+  "name": "multi-psp-router",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": "20.x",
+    "pnpm": "9.x"
+  },
+  "scripts": {
+    "dev": "corepack pnpm --parallel --filter web --filter api dev",
+    "build": "corepack pnpm -r build",
+    "test": "corepack pnpm -r test",
+    "lint": "corepack pnpm -r lint"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
