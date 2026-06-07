@@ -72,6 +72,9 @@ importers:
       '@types/node':
         specifier: ^20.17.57
         version: 20.19.42
+      dotenv-cli:
+        specifier: ^7.4.4
+        version: 7.4.4
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@20.19.42)(ts-node@10.9.2(@types/node@20.19.42)(typescript@5.9.3))

@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "corepack pnpm --filter @router/shared build && corepack pnpm --filter @router/db build && PORT=3001 nest start --watch",
-    "start:dev": "corepack pnpm --filter @router/shared build && corepack pnpm --filter @router/db build && nest start --watch",
+    "dev": "corepack pnpm --filter @router/shared build && corepack pnpm --filter @router/db build && PORT=3001 dotenv -e ../../.env.local -- nest start --watch",
+    "start:dev": "corepack pnpm --filter @router/shared build && corepack pnpm --filter @router/db build && dotenv -e ../../.env.local -- nest start --watch",
     "build": "corepack pnpm --filter @router/shared build && corepack pnpm --filter @router/db build && nest build",
     "start": "node dist/main.js",
     "lint": "tsc -p tsconfig.json --noEmit",
@@ -25,6 +25,7 @@
     "stripe": "^22.2.0"
   },
   "devDependencies": {
+    "dotenv-cli": "^7.4.4",
     "@multi-psp-router/config": "workspace:*",
     "@nestjs/cli": "^10.4.9",
     "@nestjs/schematics": "^10.2.3",
