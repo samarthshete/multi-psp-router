@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: multi-psp-router-api
+    runtime: node
+    rootDir: .
+    plan: starter
+    buildCommand: corepack pnpm install --frozen-lockfile && corepack pnpm --filter api build
+    startCommand: corepack pnpm --filter api start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: HOST
+        value: 0.0.0.0
+      - key: WEBHOOK_PROCESSING_MODE
+        value: inline
+      - key: DEMO_MODE
+        value: adyen_replay
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: ADYEN_CHECKOUT_KEY
+        sync: false
+      - key: ADYEN_MERCHANT_ACCOUNT
+        sync: false
+      - key: ADYEN_HMAC_KEY
+        sync: false

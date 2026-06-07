@@ -1,23 +1,36 @@
 {
-  "name": "@multi-psp-router/db",
+  "name": "@router/db",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
       "import": "./dist/index.js"
     }
   },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "corepack pnpm db:generate && tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch",
+    "db:generate": "dotenv -e ../../.env.local -- prisma generate",
+    "db:migrate": "dotenv -e ../../.env.local -- prisma migrate",
+    "db:studio": "dotenv -e ../../.env.local -- prisma studio",
     "lint": "tsc -p tsconfig.json --noEmit",
     "test": "echo \"No tests for db yet\""
   },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
+  },
   "devDependencies": {
-    "@multi-psp-router/config": "workspace:*"
+    "@multi-psp-router/config": "workspace:*",
+    "@types/node": "^20.17.57",
+    "dotenv-cli": "^7.4.4",
+    "prisma": "^5.22.0"
   }
 }

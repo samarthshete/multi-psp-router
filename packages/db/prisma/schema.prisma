@@ -1,0 +1,274 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Provider {
+  STRIPE
+  ADYEN
+}
+
+enum PaymentOrderStatus {
+  CREATED
+  AUTH_PENDING
+  AUTHORIZED
+  CAPTURE_PENDING
+  CAPTURED
+  FAILED
+  CANCELED
+}
+
+enum CaptureStatus {
+  REQUESTED
+  SUCCEEDED
+  FAILED
+}
+
+enum SubscriptionStatus {
+  SETUP_PENDING
+  ACTIVE
+  RENEWAL_PENDING
+  PAST_DUE
+  CANCELED
+}
+
+enum SubscriptionChargeStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+}
+
+enum SubscriptionChargeKind {
+  CIT
+  MIT
+}
+
+enum NormalizedEventType {
+  PAYMENT_AUTHORIZED
+  PAYMENT_CAPTURED
+  PAYMENT_SUCCEEDED
+  PAYMENT_FAILED
+  PAYMENT_CAPTURE_FAILED
+  TOKEN_CREATED
+  SUBSCRIPTION_CREATED
+  SUBSCRIPTION_RENEWED
+  SUBSCRIPTION_PAYMENT_FAILED
+  DISPUTE_OPENED
+  UNKNOWN
+}
+
+enum IdempotencyStatus {
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+model Customer {
+  id                    String   @id @default(cuid())
+  email                 String?
+  stripeCustomerId      String?  @unique
+  adyenShopperReference String?  @unique
+  createdAt             DateTime @default(now())
+
+  paymentMethods PaymentMethodToken[]
+  paymentOrders  PaymentOrder[]
+  subscriptions  Subscription[]
+}
+
+model PaymentMethodToken {
+  id         String   @id @default(cuid())
+  customerId String
+  provider   Provider
+  tokenId    String
+  brand      String?
+  last4      String?
+  expMonth   Int?
+  expYear    Int?
+  createdAt  DateTime @default(now())
+
+  customer      Customer       @relation(fields: [customerId], references: [id])
+  subscriptions Subscription[]
+
+  @@unique([provider, tokenId])
+}
+
+model PaymentOrder {
+  id          String             @id @default(cuid())
+  customerId  String?
+  amount      Int
+  currency    String             @db.VarChar(3)
+  provider    Provider
+  status      PaymentOrderStatus @default(CREATED)
+  externalRef String?
+  metadata    Json?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  customer         Customer?                @relation(fields: [customerId], references: [id])
+  attempts         PaymentAttempt[]
+  captures         Capture[]
+  routingDecision  RoutingDecision?
+  normalizedEvents NormalizedPaymentEvent[]
+
+  @@index([status])
+  @@index([externalRef])
+}
+
+model PaymentAttempt {
+  id             String             @id @default(cuid())
+  paymentOrderId String
+  attemptNumber  Int
+  provider       Provider
+  externalRef    String?
+  status         PaymentOrderStatus
+  errorCode      String?
+  errorMessage   String?
+  createdAt      DateTime           @default(now())
+
+  paymentOrder PaymentOrder @relation(fields: [paymentOrderId], references: [id])
+
+  @@unique([paymentOrderId, attemptNumber])
+}
+
+model Capture {
+  id             String        @id @default(cuid())
+  paymentOrderId String
+  amount         Int
+  status         CaptureStatus @default(REQUESTED)
+  externalRef    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  paymentOrder PaymentOrder @relation(fields: [paymentOrderId], references: [id])
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  customerId           String
+  paymentMethodTokenId String
+  provider             Provider
+  status               SubscriptionStatus @default(SETUP_PENDING)
+  cadence              String             @default("monthly")
+  amount               Int
+  currency             String             @db.VarChar(3)
+  externalRef          String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  customer           Customer             @relation(fields: [customerId], references: [id])
+  paymentMethodToken PaymentMethodToken   @relation(fields: [paymentMethodTokenId], references: [id])
+  charges            SubscriptionCharge[]
+}
+
+model SubscriptionCharge {
+  id             String                   @id @default(cuid())
+  subscriptionId String
+  kind           SubscriptionChargeKind
+  amount         Int
+  currency       String                   @db.VarChar(3)
+  status         SubscriptionChargeStatus @default(PENDING)
+  externalRef    String?
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+
+  @@index([subscriptionId, status])
+}
+
+model PspOperation {
+  id                 String   @id @default(cuid())
+  provider           Provider
+  operation          String
+  idempotencyKey     String
+  internalEntityType String
+  internalEntityId   String
+  requestHash        String
+  responseStatus     Int?
+  responseRef        String?
+  responseBody       Json?
+  error              String?
+  createdAt          DateTime @default(now())
+
+  @@unique([provider, idempotencyKey])
+  @@index([internalEntityType, internalEntityId])
+}
+
+model RawWebhookEvent {
+  id             String    @id @default(cuid())
+  provider       Provider
+  dedupeKey      String
+  signatureValid Boolean
+  payload        Json
+  processed      Boolean   @default(false)
+  receivedAt     DateTime  @default(now())
+  processedAt    DateTime?
+  errorMessage   String?
+
+  normalizedEvents NormalizedPaymentEvent[]
+
+  @@unique([provider, dedupeKey])
+  @@index([processed, receivedAt])
+}
+
+model NormalizedPaymentEvent {
+  id                   String              @id @default(cuid())
+  rawWebhookId         String
+  provider             Provider
+  type                 NormalizedEventType
+  paymentOrderId       String?
+  subscriptionId       String?
+  subscriptionChargeId String?
+  externalRef          String?
+  payload              Json
+  occurredAt           DateTime
+  createdAt            DateTime            @default(now())
+
+  rawWebhook   RawWebhookEvent @relation(fields: [rawWebhookId], references: [id])
+  paymentOrder PaymentOrder?   @relation(fields: [paymentOrderId], references: [id])
+
+  @@unique([rawWebhookId, type])
+  @@index([paymentOrderId])
+  @@index([subscriptionId])
+}
+
+model IdempotencyRecord {
+  id             String            @id @default(cuid())
+  scope          String
+  key            String
+  requestHash    String
+  status         IdempotencyStatus @default(IN_PROGRESS)
+  responseBody   Json?
+  responseStatus Int?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@unique([scope, key])
+}
+
+model RoutingDecision {
+  id             String   @id @default(cuid())
+  paymentOrderId String   @unique
+  chosenProvider Provider
+  reason         String
+  ruleSnapshot   Json
+  createdAt      DateTime @default(now())
+
+  paymentOrder PaymentOrder @relation(fields: [paymentOrderId], references: [id])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  entityType String
+  entityId   String
+  action     String
+  payload    Json?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+}

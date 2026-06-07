@@ -10,10 +10,14 @@
     "test": "echo \"No tests for web yet\""
   },
   "dependencies": {
-    "@multi-psp-router/shared": "workspace:*",
+    "@adyen/adyen-web": "^6.38.0",
+    "@router/shared": "workspace:*",
+    "@stripe/react-stripe-js": "^6.6.0",
+    "@stripe/stripe-js": "^9.7.0",
     "next": "14.2.30",
     "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react-dom": "18.3.1",
+    "ulid": "^3.0.2"
   },
   "devDependencies": {
     "@multi-psp-router/config": "workspace:*",

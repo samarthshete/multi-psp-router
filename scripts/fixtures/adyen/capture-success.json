@@ -1,0 +1,23 @@
+{
+  "notificationItems": [
+    {
+      "NotificationRequestItem": {
+        "additionalData": {
+          "hmacSignature": "fixture-signature"
+        },
+        "amount": {
+          "currency": "EUR",
+          "value": 1000
+        },
+        "eventCode": "CAPTURE",
+        "eventDate": "2026-06-06T12:10:00+02:00",
+        "merchantAccountCode": "TestMerchant",
+        "merchantReference": "po_capture_success",
+        "originalReference": "adyen_auth_success_psp",
+        "paymentMethod": "visa",
+        "pspReference": "adyen_capture_success_psp",
+        "success": "true"
+      }
+    }
+  ]
+}

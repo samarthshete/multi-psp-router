@@ -1,0 +1,23 @@
+{
+  "notificationItems": [
+    {
+      "NotificationRequestItem": {
+        "additionalData": {
+          "hmacSignature": "fixture-signature"
+        },
+        "amount": {
+          "currency": "EUR",
+          "value": 1000
+        },
+        "eventCode": "AUTHORISATION",
+        "eventDate": "2026-06-06T12:00:00+02:00",
+        "merchantAccountCode": "TestMerchant",
+        "merchantReference": "po_auth_success",
+        "operations": ["CANCEL", "CAPTURE", "REFUND"],
+        "paymentMethod": "visa",
+        "pspReference": "adyen_auth_success_psp",
+        "success": "true"
+      }
+    }
+  ]
+}

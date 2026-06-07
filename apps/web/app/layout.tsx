@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@adyen/adyen-web/styles/adyen.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
