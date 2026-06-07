@@ -3,7 +3,7 @@ services:
     name: multi-psp-router-api
     runtime: node
     rootDir: .
-    plan: starter
+    plan: free
     buildCommand: corepack pnpm install --frozen-lockfile && corepack pnpm --filter api build
     startCommand: corepack pnpm --filter api start
     healthCheckPath: /health
