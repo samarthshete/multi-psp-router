@@ -79,6 +79,7 @@ export class StripeStrategy implements PaymentProviderStrategy {
         amount: this.getAmount(input),
         currency: this.getCurrency(input).toLowerCase(),
         payment_method: this.getPaymentMethodHandle(input.paymentMethod),
+        payment_method_types: ["card"],
         capture_method: "manual",
         confirm: true,
         metadata: this.toStripeMetadata(input.metadata)
@@ -129,6 +130,7 @@ export class StripeStrategy implements PaymentProviderStrategy {
         currency: this.getCurrency(input).toLowerCase(),
         customer: input.customer?.providerCustomerId ?? input.customerExternalRef,
         payment_method: input.paymentMethodTokenId ?? input.paymentMethod?.handle,
+        payment_method_types: ["card"],
         confirm: true,
         setup_future_usage: "off_session",
         metadata: this.toStripeMetadata(input.metadata)
@@ -158,6 +160,7 @@ export class StripeStrategy implements PaymentProviderStrategy {
         currency: this.getCurrency(input).toLowerCase(),
         customer: input.customer?.providerCustomerId,
         payment_method: input.paymentMethodTokenId ?? input.storedPaymentMethodId,
+        payment_method_types: ["card"],
         off_session: true,
         confirm: true,
         metadata: this.toStripeMetadata(input.metadata)
