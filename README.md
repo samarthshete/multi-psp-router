@@ -97,32 +97,32 @@ The dashboard is deliberately plain. It exposes request and response bodies, pro
 
 ## Production Readiness
 
-- Repository: pending public repo URL
-- Live demo: pending `multi-psp-router-web` Vercel deployment
-- API: pending Render service URL for `multi-psp-router-api`
+- Repository: https://github.com/samarthshete/multi-psp-router
+- Live demo: https://multi-psp-router-web.vercel.app
+- API: https://multi-psp-router-api.onrender.com
 - Loom walkthrough: pending recording URL
 - Web deploy config: `vercel.json`
 - API deploy config: `render.yaml`
-- Smoke test: `scripts/smoke-test.sh <deployed-api-url>`
+- Smoke test: `bash scripts/smoke-test.sh https://multi-psp-router-api.onrender.com`
 
 ### Deployment Environment
 
 Configure these in the Vercel web project:
 
 ```bash
-NEXT_PUBLIC_API_BASE_URL=
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+NEXT_PUBLIC_API_BASE_URL=https://multi-psp-router-api.onrender.com
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=<stripe publishable test key>
 NEXT_PUBLIC_ADYEN_CLIENT_KEY=
 ```
 
 Configure these in the Render API service:
 
 ```bash
-DATABASE_URL=
-DIRECT_URL=
-CORS_ORIGIN=
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
+DATABASE_URL=<supabase transaction pooler url>
+DIRECT_URL=<supabase direct url for migrations>
+CORS_ORIGIN=https://multi-psp-router-web.vercel.app
+STRIPE_SECRET_KEY=<stripe secret test key>
+STRIPE_WEBHOOK_SECRET=<stripe webhook signing secret>
 ADYEN_CHECKOUT_KEY=
 ADYEN_MERCHANT_ACCOUNT=
 ADYEN_HMAC_KEY=
@@ -134,11 +134,12 @@ HOST=0.0.0.0
 ### §21 Checklist
 
 - [x] Production deploy config exists for web and API.
-- [ ] Web project deployed to Vercel.
-- [ ] API project deployed to Render.
-- [ ] Production env vars configured in both projects.
-- [ ] Stripe live webhook registered to `/webhooks/stripe`.
+- [x] Web project deployed to Vercel.
+- [x] API project deployed to Render.
+- [x] Production env vars configured in both projects.
+- [x] Stripe webhook registered to `/webhooks/stripe`.
 - [ ] Adyen live webhook registered to `/webhooks/adyen`, or `DEMO_MODE=adyen_replay` explicitly used.
-- [ ] Deployed auth-capture smoke test passed.
+- [x] Adyen live webhook skipped; `DEMO_MODE=adyen_replay` is explicitly used.
+- [x] Deployed auth-capture smoke test passed.
 - [ ] Loom walkthrough recorded and linked.
-- [ ] Git history secret scan passed.
+- [x] Git history secret scan passed.
