@@ -15,6 +15,16 @@ import {
 } from "./strategies/adyen.strategy";
 import { STRIPE_CLIENT, StripeStrategy } from "./strategies/stripe.strategy";
 
+function requiredEnv(name: string): string {
+  const value = process.env[name]?.trim().replace(/^["']|["']$/g, "");
+
+  if (!value) {
+    throw new Error(`${name} is not configured`);
+  }
+
+  return value;
+}
+
 @Module({
   imports: [IdempotencyModule],
   controllers: [PaymentsController],
@@ -22,7 +32,15 @@ import { STRIPE_CLIENT, StripeStrategy } from "./strategies/stripe.strategy";
     PaymentRouterService,
     {
       provide: STRIPE_CLIENT,
-      useFactory: () => new Stripe(process.env.STRIPE_SECRET_KEY ?? "test")
+      useFactory: () => {
+        const secretKey = requiredEnv("STRIPE_SECRET_KEY");
+
+        if (!secretKey.startsWith("sk_")) {
+          throw new Error("STRIPE_SECRET_KEY must be a Stripe secret key");
+        }
+
+        return new Stripe(secretKey);
+      }
     },
     {
       provide: ADYEN_CHECKOUT_CLIENT,

@@ -5,6 +5,7 @@ import {
   Headers,
   HttpException,
   HttpStatus,
+  Logger,
   Param,
   Post
 } from "@nestjs/common";
@@ -34,6 +35,8 @@ type CaptureResponse = {
 
 @Controller("payments")
 export class PaymentsController {
+  private readonly logger = new Logger(PaymentsController.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly idempotency: IdempotencyService,
@@ -200,6 +203,10 @@ export class PaymentsController {
         externalRef: authHold.externalRef
       };
     } catch (error) {
+      this.logger.error(
+        `PSP auth hold failed for paymentOrderId=${paymentOrder.id}`,
+        this.getErrorMessage(error)
+      );
       await this.markAuthHoldFailed(paymentOrder.id, attempt.id, operation.id, error);
       throw new HttpException("PSP auth hold failed", HttpStatus.BAD_GATEWAY);
     }
@@ -289,6 +296,10 @@ export class PaymentsController {
         externalRef: captureResult.externalRef
       };
     } catch (error) {
+      this.logger.error(
+        `PSP capture failed for paymentOrderId=${paymentOrderId}`,
+        this.getErrorMessage(error)
+      );
       await this.markCaptureFailed(paymentOrderId, capture.id, operation.id, error);
       throw new HttpException("PSP capture failed", HttpStatus.BAD_GATEWAY);
     }

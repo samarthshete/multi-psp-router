@@ -184,7 +184,7 @@ export class StripeStrategy implements PaymentProviderStrategy {
     rawBody: Buffer,
     headers: Record<string, string>
   ): Promise<VerifiedWebhook> {
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim().replace(/^["']|["']$/g, "");
 
     if (!webhookSecret) {
       throw new Error("STRIPE_WEBHOOK_SECRET is not configured");
